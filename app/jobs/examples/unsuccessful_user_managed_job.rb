@@ -8,6 +8,7 @@ class Examples::UnsuccessfulUserManagedJob < BaseJob
 
   def perform
     Rails.logger.debug "Working..."
+    sleep 1
     raise "Something went wrong during job execution"
   end
 end
