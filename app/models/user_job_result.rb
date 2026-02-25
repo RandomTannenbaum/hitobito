@@ -20,6 +20,8 @@
 #
 
 class UserJobResult < ApplicationRecord
+  belongs_to :delayed_job
+
   class << self
     FILENAME_REGEX = /\A(.*)_(\d+)-(\d+)\z/
 
