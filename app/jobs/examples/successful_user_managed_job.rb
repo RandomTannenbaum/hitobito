@@ -10,6 +10,5 @@ class Examples::SuccessfulUserManagedJob < BaseJob
 
   def perform
     Rails.logger.debug "Working..."
-    sleep 1
   end
 end
