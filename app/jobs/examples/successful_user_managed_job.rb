@@ -6,8 +6,9 @@
 class Examples::SuccessfulUserManagedJob < BaseJob
   prepend UserManageableJob
 
+  self.job_name = "Custom job name"
+
   def perform
     Rails.logger.debug "Working..."
-    sleep 1
   end
 end

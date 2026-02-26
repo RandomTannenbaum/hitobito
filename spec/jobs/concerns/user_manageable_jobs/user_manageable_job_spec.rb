@@ -29,21 +29,22 @@ describe UserManageableJob do
 
   it "should have status in_progress when job is being worked off" do
     job = Examples::LongRunningUserManagedJob.new
-    job.enqueue!
+    enqueued_job = job.enqueue!
     job_worker_thread = Thread.new do
-      work_off_jobs
+      work_off_job(enqueued_job)
     end
 
-    sleep 3
+    sleep 2
     user_job_result = job.user_job_result
     expect(user_job_result.status).to eql("in_progress")
     job_worker_thread.terminate
   end
 
   it "should have status success when job has been worked off without any errors" do
-    job = Examples::SuccessfulUserManagedJob.new.enqueue!
+    job = Examples::SuccessfulUserManagedJob.new
+    enqueued_job = job.enqueue!
 
-    expect { work_off_jobs }.to change(Delayed::Job, :count).by(-1)
+    expect { work_off_job(enqueued_job) }.to change(Delayed::Job, :count).by(-1)
 
     user_job_result = job.user_job_result
     expect(user_job_result.status).to eql("success")
@@ -51,18 +52,52 @@ describe UserManageableJob do
 
   it "should have status error when last job retry failed" do
     job = Examples::UnsuccessfulUserManagedJob.new
-    job.enqueue!
-    work_off_jobs
+    enqueued_job = job.enqueue!
+    2.times { work_off_job(enqueued_job) }
 
     user_job_result = job.user_job_result
     expect(user_job_result.status).to eql("error")
     expect(user_job_result.attempts).to eql(2)
   end
 
-  def work_off_jobs
+  it "should increase attempt number after failure" do
+    job = Examples::UnsuccessfulUserManagedJob.new
+    enqueued_job = job.enqueue!
+    work_off_job(enqueued_job)
+
+    user_job_result = job.user_job_result
+    expect(user_job_result.status).to eql("planned")
+    expect(user_job_result.attempts).to eql(1)
+  end
+
+  it "should report progress" do
+    job = Examples::UserManagedJobWithProgress.new
+    enqueued_job = job.enqueue!
+    work_off_job(enqueued_job)
+
+    user_job_result = job.user_job_result
+    expect(user_job_result.status).to eql("success")
+    expect(user_job_result.progress).to eql(100)
+  end
+
+  it "should use custom job name if set" do
+    job = Examples::SuccessfulUserManagedJob.new
+    job.enqueue!
+    user_job_result = job.user_job_result
+    expect(user_job_result.name).to eql("Custom job name")
+  end
+
+  it "should use class name as job name if custom name is not set" do
+    job = Examples::UnsuccessfulUserManagedJob.new
+    job.enqueue!
+    user_job_result = job.user_job_result
+    expect(user_job_result.name).to eql("Examples::UnsuccessfulUserManagedJob")
+  end
+
+  def work_off_job(job)
     worker = Delayed::Worker.new
     worker.max_run_time = 10.seconds
     worker.max_attempts = 2
-    worker.work_off
+    worker.run(job)
   end
 end

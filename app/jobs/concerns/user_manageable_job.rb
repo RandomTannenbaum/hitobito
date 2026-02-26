@@ -7,8 +7,9 @@ module UserManageableJob
   extend ActiveSupport::Concern
 
   prepended do
-    class_attribute :job_name, default: self.name
-    self.parameters = self.parameters.to_a + [:user_job_result_id]
+    class_attribute :job_name, default: name
+    class_attribute :reports_progress, default: false
+    self.parameters = parameters.to_a + [:user_job_result_id]
   end
 
   def enqueue!
@@ -16,9 +17,9 @@ module UserManageableJob
     raise "User manageable jobs must be called from context with auth user" unless current_person
 
     user_job_result = UserJobResult.create!(
-      person_id: current_person.id, name: self.job_name,
+      person_id: current_person.id, name: job_name,
       status: "planned", start_timestamp: Time.now.to_i,
-      attempts: 0
+      attempts: 0, progress: (reports_progress ? 0 : nil)
     )
     @user_job_result_id = user_job_result.id
 
@@ -37,11 +38,21 @@ module UserManageableJob
     super if defined?(super)
   end
 
-  def error(_job, exception, payload = parameters)
-    if user_job_result.attempts == Delayed::Worker.max_attempts
-      user_job_result&.update!(status: "error")
-    end
+  def failure(job)
+    user_job_result&.update!(status: "error")
+    super if defined?(super)
+  end
+
+  def error(job, exception, payload = parameters)
+    user_job_result&.update!(status: "planned", attempts: job.attempts + 1)
     super
+  end
+
+  def report_progress(current_iteration, iteration_count)
+    if reports_progress
+      progress = (100.to_f / iteration_count) * (current_iteration + 1)
+      user_job_result&.update!(progress:)
+    end
   end
 
   def user_job_result

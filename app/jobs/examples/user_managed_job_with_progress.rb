@@ -3,11 +3,15 @@
 #  or later. See the COPYING file at the top-level directory or at
 #  https://github.com/hitobito/hitobito.
 
-class Examples::UnsuccessfulUserManagedJob < BaseJob
+class Examples::UserManagedJobWithProgress < BaseJob
   prepend UserManageableJob
 
+  self.reports_progress = true
+
   def perform
-    Rails.logger.debug "Working..."
-    raise "Something went wrong during job execution"
+    5.times do |i|
+      Rails.logger.debug "Working..."
+      report_progress(i, 5)
+    end
   end
 end
