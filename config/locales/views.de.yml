@@ -2252,6 +2252,11 @@ de:
     cannot_create: Bitte wähle einen bestehenden Tag aus
     no_entry: (keine)
 
+  user_job_results:
+    index:
+      title: Jobs
+      no_progress_provided: Dieser Job hat keinen nachverfolgbaren Fortschritt
+
   version:
     attribute_change:
       from_to: "%{attr} wurde von <i>%{from}</i> auf <i>%{to}</i> geändert."
