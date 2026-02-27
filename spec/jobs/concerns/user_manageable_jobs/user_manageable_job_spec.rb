@@ -6,6 +6,8 @@
 require "spec_helper"
 
 describe UserManageableJob do
+  include DelayedJobSpecHelper
+
   let(:person) { people(:top_leader) }
 
   before do
@@ -92,12 +94,5 @@ describe UserManageableJob do
     job.enqueue!
     user_job_result = job.user_job_result
     expect(user_job_result.name).to eql("Examples::UnsuccessfulUserManagedJob")
-  end
-
-  def work_off_job(job)
-    worker = Delayed::Worker.new
-    worker.max_run_time = 10.seconds
-    worker.max_attempts = 2
-    worker.run(job)
   end
 end
