@@ -34,17 +34,20 @@ module UserManageableJob
   end
 
   def success(job = nil)
-    user_job_result&.update!(status: "success")
+    user_job_result&.update!(status: "success", end_timestamp: Time.now.to_i)
     super if defined?(super)
   end
 
   def failure(job)
-    user_job_result&.update!(status: "error")
+    user_job_result&.update!(status: "error", end_timestamp: Time.now.to_i)
     super if defined?(super)
   end
 
   def error(job, exception, payload = parameters)
-    user_job_result&.update!(status: "planned", attempts: job.attempts + 1)
+    user_job_result&.update!(
+      status: "planned", attempts: job.attempts + 1,
+      progress: (reports_progress ? 0 : nil)
+    )
     super
   end
 
