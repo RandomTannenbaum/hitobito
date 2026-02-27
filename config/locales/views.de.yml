@@ -2256,6 +2256,9 @@ de:
     index:
       title: Jobs
       no_progress_provided: Dieser Job hat keinen nachverfolgbaren Fortschritt
+      start_timestamp: Startzeitpunkt
+      end_timestamp: Endzeitpunkt
+      attempts: Versuche
 
   version:
     attribute_change:
