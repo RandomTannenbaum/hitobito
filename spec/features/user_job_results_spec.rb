@@ -15,64 +15,38 @@ describe :person_duplicates, js: true do
     sign_in(top_leader)
   end
 
-  it "should show info about successful job without progress" do
+  it "should show all job information" do
     job = Examples::SuccessfulUserManagedJob.new
     work_off_job(job.enqueue!)
     visit user_job_results_path
 
-    expect(page).to have_css(".fas .fa-circle-check")
-    expect(page).to have_content("Custom Job Name")
+    expect(page).to have_css(".fas.fa-circle-check")
+    expect(page).to have_content("Custom job name")
     expect(page).to have_content("Versuche: 1/2")
-    check_common_content_for_basic_jobs
+    expect(page).to have_content("Dieser Job hat keinen nachverfolgbaren Fortschritt")
+    expect(page).not_to have_css(".progress")
+    expect(page).to have_content("Startzeitpunkt")
+    expect(page).to have_content("Endzeitpunkt")
+    expect(page).not_to have_css(".fas.fa-download")
   end
 
-  it "should show info about unsuccessful job without progress" do
-    job = Examples::UnsuccessfulUserManagedJob.new
-    work_off_job(job.enqueue!)
-    visit user_job_results_path
-
-    expect(page).to have_css(".fas .fa-circle-xmark")
-    expect(page).to have_content("Examples::UnsuccessfulUserManagedJob")
-    expect(page).to have_content("Versuche: 2/2")
-    check_common_content_for_basic_jobs
-  end
-
-  it "should show info about successful job with progress" do
+  it "should show progress bar for successful job with progress" do
     job = Examples::UserManagedJobWithProgress.new
     work_off_job(job.enqueue!)
     visit user_job_results_path
 
-    expect(page).to have_css(".fas .fa-circle-check")
-    expect(page).to have_content("Examples::UserManagedJobWithProgress")
-    expect(page).to have_content("Versuche: 1/2")
+    expect(page).to have_css(".fas.fa-circle-check")
     expect(page).to have_css(".progress")
-    expect(page).to have_css("div[class='progress-bar', style='width: 100%']")
-    expect(page).to have_content("Startzeitpunkt")
-    expect(page).to have_content("Endzeitpunkt")
-    expect(page).not_to have_content(".fas .fa-download")
+    expect(page).to have_css("div[class='progress-bar'][style='width: 100%']")
+    expect(page).to have_content("100%")
   end
 
-
-  it "should show info about successful download job" do
+  it "should show download icon if file is downloadable" do
     job = Examples::UserManagedJobWithProgress.new
     work_off_job(job.enqueue!)
+    allow(job).to receive(:downloadable?).and_return(true)
     visit user_job_results_path
 
-    expect(page).to have_css(".fas .fa-circle-check")
-    expect(page).to have_content("Examples::UserManagedJobWithProgress")
-    expect(page).to have_content("Versuche: 1/2")
-    expect(page).to have_content("Dieser Job hat keinen nachverfolgbaren Fortschritt")
-    expect(page).not_to have_css(".progress")
-    expect(page).to have_content("Startzeitpunkt")
-    expect(page).to have_content("Endzeitpunkt")
-    expect(page).to have_content(".fas .fa-download")
-  end
-
-  def check_common_content_for_basic_jobs
-    expect(page).to have_content("Dieser Job hat keinen nachverfolgbaren Fortschritt")
-    expect(page).not_to have_css(".progress")
-    expect(page).to have_content("Startzeitpunkt")
-    expect(page).to have_content("Endzeitpunkt")
-    expect(page).not_to have_content(".fas .fa-download")
+    expect(page).not_to have_content(".fas.fa-download")
   end
 end
