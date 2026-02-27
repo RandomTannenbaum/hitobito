@@ -50,6 +50,7 @@
                 = render 'layouts/quicksearch'
               - else
                 = render 'layouts/languages'
+              = link_to icon('bars-progress'), user_job_results_path
               = link_to current_user, person_home_path(current_user), class: (render_nav? ? 'd-none d-md-block' : nil)
               = link_to t('layouts.nav.sign_out'), sign_out_path, 'data-method': :delete, class: (render_nav? ? 'd-none d-md-block' : nil)
             - elsif current_user.nil? # nil without login, false on error

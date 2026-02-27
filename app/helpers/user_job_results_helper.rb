@@ -13,7 +13,7 @@ module UserJobResultsHelper
     }
 
     icon_name = icon_names_by_status[status]
-    icon_options = {filled: true}
+    icon_options = {filled: true, "data-bs-toggle": "tooltip", title: t(".status.#{status}")}
     icon_options[:class] = "fa-spin-pulse" if status == :in_progress
 
     icon(icon_name, icon_options)
