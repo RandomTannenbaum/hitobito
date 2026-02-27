@@ -2215,6 +2215,7 @@ en:
   user_job_results:
     index:
       title: Job overview
+    user_job_result:
       no_progress_provided: This Job doesnt provide a progress
       start_timestamp: Start time
       end_timestamp: End time
