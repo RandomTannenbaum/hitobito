@@ -20,7 +20,7 @@
 #
 
 class UserJobResult < ApplicationRecord
-  belongs_to :delayed_job
+  belongs_to :delayed_job, class_name: "Delayed::Backend::ActiveRecord::Job", optional: true
 
   class << self
     FILENAME_REGEX = /\A(.*)_(\d+)-(\d+)\z/

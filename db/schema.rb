@@ -1306,6 +1306,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_080027) do
     t.datetime "updated_at", null: false
     t.datetime "end_timestamp"
     t.string "status"
+    t.integer "attempts"
     t.bigint "delayed_job_id"
     t.index ["delayed_job_id"], name: "index_user_job_results_on_delayed_job_id"
   end

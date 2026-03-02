@@ -5,7 +5,8 @@ class MigrateAsyncDownloadFileToUserJobResult < ActiveRecord::Migration[8.0]
       t.rename :timestamp, :start_timestamp
       t.datetime :end_timestamp
       t.string :status
+      t.integer :attempts
+      t.references :delayed_job, foreign_key: false
     end
-    add_reference :user_job_results, :delayed_job
   end
 end
