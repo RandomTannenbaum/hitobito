@@ -1304,7 +1304,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_25_080027) do
     t.string "start_timestamp", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "end_timestamp"
+    t.string "end_timestamp"
     t.string "status"
     t.integer "attempts"
     t.bigint "delayed_job_id"

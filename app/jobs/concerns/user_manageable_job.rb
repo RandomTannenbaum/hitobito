@@ -19,7 +19,8 @@ module UserManageableJob
     user_job_result = UserJobResult.create!(
       person_id: current_person.id, name: job_name,
       status: "planned", start_timestamp: Time.now.to_i,
-      attempts: 0, progress: (reports_progress ? 0 : nil)
+      attempts: 0, progress: (reports_progress ? 0 : nil),
+      filetype: @format || :txt
     )
     @user_job_result_id = user_job_result.id
 
@@ -33,18 +34,29 @@ module UserManageableJob
     super
   end
 
-  def success(job = nil)
-    user_job_result&.update!(status: "success")
+  def success(job)
+    user_job_result&.update!(
+      status: "success",
+      end_timestamp: Time.now.to_i,
+      attempts: job.attempts + 1
+    )
     super if defined?(super)
   end
 
   def failure(job)
-    user_job_result&.update!(status: "error")
+    user_job_result&.update!(
+      status: "error",
+      end_timestamp: Time.now.to_i
+    )
     super if defined?(super)
   end
 
   def error(job, exception, payload = parameters)
-    user_job_result&.update!(status: "planned", attempts: job.attempts + 1)
+    user_job_result&.update!(
+      status: "planned",
+      attempts: job.attempts + 1,
+      progress: (reports_progress ? 0 : nil)
+    )
     super
   end
 
