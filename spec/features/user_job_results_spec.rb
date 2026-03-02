@@ -5,7 +5,7 @@
 
 require "spec_helper"
 
-describe :person_duplicates, js: true do
+describe :user_job_results, js: true do
   include DelayedJobSpecHelper
 
   let(:top_leader) { people(:top_leader) }

@@ -59,6 +59,8 @@ class UserJobResult < ApplicationRecord
   end
 
   has_one_attached :generated_file
+
+  # Source: Google Gemini
   after_create_commit -> { broadcast_prepend_to "user_job_results" }
   after_update_commit -> { broadcast_replace_to "user_job_results" }
   after_destroy_commit -> { broadcast_remove_to "user_job_results" }
