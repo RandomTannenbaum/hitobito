@@ -2265,6 +2265,9 @@ de:
         in_progress: In Bearbeitung
         success: Erfolgreich abgeschlossen
         error: Bei der Bearbeitung trat ein Fehler auf
+    user_job_result_notification:
+      job_success: Job erfolgreich abgeschlossen
+      job_error: Fehler bei Jobausführung aufgetreten
 
   version:
     attribute_change:

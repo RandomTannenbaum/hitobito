@@ -54,9 +54,32 @@ describe :person_duplicates, js: true do
     visit user_job_results_path
     expect(page).not_to have_content("Custom job name")
 
-    job = Examples::UserManagedJobWithProgress.new
+    job = Examples::SuccessfulUserManagedJob.new
     work_off_job(job.enqueue!)
 
     expect(page).to have_content("Custom job name")
+  end
+
+  it "should show notification when job has successfully completed" do
+    visit user_job_results_path
+
+    expect(page).not_to have_content("Job erfolgreich abgeschlossen")
+
+    job = Examples::SuccessfulUserManagedJob.new
+    work_off_job(job.enqueue!)
+
+    expect(page).to have_content("Job erfolgreich abgeschlossen")
+  end
+
+  it "should show notification when job has failed" do
+    visit root_path
+
+    expect(page).not_to have_content("Fehler bei Jobausführung aufgetreten")
+
+    job = Examples::UnsuccessfulUserManagedJob.new
+    enqueued_job = job.enqueue!
+    2.times { work_off_job(enqueued_job) }
+
+    expect(page).to have_content("Fehler bei Jobausführung aufgetreten")
   end
 end

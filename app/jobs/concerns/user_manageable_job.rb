@@ -40,6 +40,7 @@ module UserManageableJob
       end_timestamp: Time.now.to_i,
       attempts: job.attempts + 1
     )
+    broadcast_notification
     super if defined?(super)
   end
 
@@ -48,6 +49,7 @@ module UserManageableJob
       status: "error",
       end_timestamp: Time.now.to_i
     )
+    broadcast_notification
     super if defined?(super)
   end
 
@@ -69,5 +71,16 @@ module UserManageableJob
 
   def user_job_result
     @user_job_result ||= UserJobResult.find(@user_job_result_id)
+  end
+
+  private
+
+  def broadcast_notification
+    Turbo::StreamsChannel.broadcast_append_to(
+      "user_job_result_notifications",
+      partial: "user_job_results/user_job_result_notification",
+      locals: {user_job_result:},
+      target: "user-job-result-notification-placeholder"
+    )
   end
 end
