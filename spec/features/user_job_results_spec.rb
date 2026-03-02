@@ -49,4 +49,14 @@ describe :person_duplicates, js: true do
 
     expect(page).not_to have_content(".fas.fa-download")
   end
+
+  it "should update user job results live" do
+    visit user_job_results_path
+    expect(page).not_to have_content("Custom job name")
+
+    job = Examples::UserManagedJobWithProgress.new
+    work_off_job(job.enqueue!)
+
+    expect(page).to have_content("Custom job name")
+  end
 end
